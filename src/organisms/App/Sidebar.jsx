@@ -2,9 +2,10 @@ import React from 'react';
 import classnames from 'classnames';
 import { Nav, NavLink } from 'reactstrap';
 import { AppIcon } from '../../atoms';
-import { es } from '../../lib';
 
-export const AppSidebar = ({ children, className, isCollapsed, toggleIsCollapsed,...props }) => {
+export const AppSidebar = ({ children, className, isCollapsed, toggleIsCollapsed, ...props }) => {
+  const { translate } = props;
+
   return (
     <section className={classnames(`AppSidebar side-menu-section ${className || ''}`, {'collapsed-side-menu': isCollapsed})}>
       <div className={classnames({ collapsedWrapper: isCollapsed }, 'collapse-horizontal')}>
@@ -15,7 +16,7 @@ export const AppSidebar = ({ children, className, isCollapsed, toggleIsCollapsed
           <Nav vertical>
             <NavLink href='/'>
               <AppIcon iconName={'list'} />
-              <span>{es.sidebar.repos}</span>
+              <span>{translate('sidebar.users')}</span>
             </NavLink>
           </Nav>
         </div>

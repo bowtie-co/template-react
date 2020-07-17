@@ -20,7 +20,11 @@ export const es = {
     name: 'Nombre',
     country: 'País',
     message: 'Mensaje',
-    type: 'Tipo'
+    type: 'Tipo',
+    home: 'Hogar',
+    welcome: 'Bienvenidas',
+    not_found: 'No Encontrada',
+    oops: 'Uy'
   },
   permissions: {
     admin: 'Admin',

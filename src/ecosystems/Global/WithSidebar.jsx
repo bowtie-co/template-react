@@ -11,8 +11,6 @@ import {
 } from '../../organisms';
 
 export const WithSidebar = ({ children, className, ...props }) => {
-  console.debug('WithSidebar', { props });
-
   const [ isCollapsed, setIsCollapsed ] = useState(false);
   const toggleIsCollapsed = () => setIsCollapsed(!isCollapsed);
 

@@ -1,19 +1,12 @@
-import React, { Fragment } from 'react';
-import {
-  WithApp
-} from '../../ecosystems';
-import {
-  DebugProps
-} from '../../organisms';
+import React from 'react';
+import { WithApp } from '../../ecosystems';
+import { DebugProps, AppHome } from '../../organisms';
 
-export const AppHome = (props) => {
+export const PageHome = (props) => {
   return (
     <WithApp {...props}>
-      <Fragment>
-        <h1>Home</h1>
-        <p>Welcome</p>
-        <DebugProps debug {...props} />
-      </Fragment>
+      <AppHome />
+      <DebugProps debug {...props} />
     </WithApp>
   );
 };

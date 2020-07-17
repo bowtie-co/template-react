@@ -22,7 +22,11 @@ export const en = {
     name: 'Name',
     country: 'Country',
     message: 'Message',
-    type: 'Type'
+    type: 'Type',
+    home: 'Home',
+    welcome: 'Welcome',
+    not_found: 'Not Found',
+    oops: 'Oops'
   },
   permissions: {
     admin: 'Admin',

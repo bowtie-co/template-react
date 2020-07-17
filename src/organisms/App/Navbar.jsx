@@ -6,12 +6,13 @@ import {
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand
+  NavbarBrand,
+  Badge
 } from 'reactstrap';
-import { AppIcon } from '../../atoms';
+// import { AppIcon } from '../../atoms';
 
 export const AppNavbar = ({ children, ...props }) => {
-  console.debug('AppNavbar', { props });
+  const { languages, lang, setLang } = props;
 
   const [ isNavOpen, setIsNavOpen ] = useState(false);
   const toggleNav = () => setIsNavOpen(prevState => !prevState);
@@ -26,12 +27,16 @@ export const AppNavbar = ({ children, ...props }) => {
 
       {/* TODO: How to better structure the layout + collapse for better mobile UX? */}
       <Collapse isOpen={isNavOpen} navbar>
-        <Nav className="ml-auto" navbar>
-          <NavItem>
-            <NavLink title={'title'} href={'//google.com'} target='_blank' rel='noopener noreferrer'>
-              <AppIcon className='fab fa-github' color='#07102c' size='md' />
-            </NavLink>
-          </NavItem>
+        <Nav className='ml-auto' navbar>
+          {languages.map((l, i) => (
+            <NavItem>
+              <NavLink title={('general.edit')} onClick={() => setLang(l)}>
+                <Badge pill color={l === lang ? 'success' : 'warning'}>
+                  {l}
+                </Badge>
+              </NavLink>
+            </NavItem>
+          ))}
         </Nav>
       </Collapse>
     </Navbar>
