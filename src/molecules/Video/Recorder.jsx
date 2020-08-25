@@ -1,26 +1,29 @@
-import React, { Fragment, useRef, useEffect, useState } from 'react';
+import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { ButtonBasic } from '../../atoms/Button';
+import freddieCam from '../../images/filters/freddieCam.png';
 
 export const VideoRecorder = () => {
-  const videoDisplay = useRef(null)
-  const videoDisplayAfter = useRef(null)
+  const videoDisplay = useRef(null);
+  const videoDisplayAfter = useRef(null);
+  const [ showFilter, setShowFilter ] = useState(false);
+  const [ showCountdown, setShowCountdown ] = useState(false);
+  const [ countdownSeconds, setCountdownSeconds ] = useState(5);
   const [ permissionGranted, setPermissionGranted ] = useState(false);
   const [ showRecordedVideo, setShowRecordedVideo ] = useState(false);
   const chunks = [];
 
   const getPermissionAndMedia = async () => {
     let stream = null;
-    const constraints = { audio: true, video: true }
 
     try {
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
       /* use the stream */
-      console.log('Accepted!', stream);
       setPermissionGranted(true);
       return stream;
     } catch(err) {
       /* handle the error */
       console.log('Rejected!', err);
+      alert('You must allow audio/video for this feature to work. Please update your site settings');
     }
   };
 
@@ -60,10 +63,25 @@ export const VideoRecorder = () => {
     getPermissionAndMedia().then((stream) => {
       videoDisplay.current.srcObject = stream;
     });
-  }
+  };
+
+  const startCountdown = () => {
+    let seconds = countdownSeconds;
+    setShowCountdown(true);
+
+    const countdown = setInterval(() => {
+      seconds -= 1;
+      setCountdownSeconds(seconds);
+      if (seconds === 0) {
+        clearInterval(countdown);
+        setShowCountdown(false);
+        record();
+      }
+    }, 1000);
+  };
 
   const record = () => {
-    getPermissionAndMedia().then((stream) => {
+    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
       videoDisplay.current.srcObject = stream;
       const options = {mimeType: 'video/webm;codecs=vp9'};
       const recorder = new MediaRecorder(stream, options);
@@ -72,39 +90,39 @@ export const VideoRecorder = () => {
       recorder.start();
       // recorder.start(5000);
 
+      // 14-15 seconds
       setTimeout(() => {
         recorder.stop();
       }, 6000);
     });
-  }
+  };
 
-  const checkPermissions = () => {
-    navigator.permissions.query({ name: 'camera' }).then((result) => {
-      switch (result.state) {
-        case 'granted': setPermissionGranted(true); preview(); break;
-        case 'prompt': preview(); break;
-        case 'denied': getPermissionAndMedia().then(() => alert('Please update your site settings to allow audio/video')); break;
-        default: preview();
-      }
-    });
-  }
-
-  useEffect(() => {
-    navigator.permissions.query({ name: 'camera' }).then((result) => {
-      if (result.state === 'granted') {
-        setPermissionGranted(true);
-        preview();
-      }
-    });
-  }, [])
+  useEffect(() => preview(), []);
 
   return (
     <Fragment>
-      {!permissionGranted && <ButtonBasic onClick={() => checkPermissions()}>Preview Video</ButtonBasic>}
-      {permissionGranted && <ButtonBasic onClick={() => record()}>Record Video</ButtonBasic>}
+      {!permissionGranted && <ButtonBasic onClick={() => preview()}>Preview Video</ButtonBasic>}
+      {permissionGranted && (
+        <Fragment>
+          <ButtonBasic onClick={() => startCountdown()} className={'btn-danger'}>Record Video</ButtonBasic>
+          <ButtonBasic onClick={() => setShowFilter(!showFilter)} className={'btn-info'}>Toggle Filter</ButtonBasic>
+        </Fragment>
+      )}
       <br /><br />
-      <video ref={videoDisplay} width={'240px'} height={'135px'} autoPlay style={{transform: 'scaleX(-1)'}}></video>
-      {showRecordedVideo && <video ref={videoDisplayAfter} width={'240px'} height={'135px'} controls></video> }
+      <div style={{width: '240px', height: '135px'}}>
+        {showCountdown && (
+          <div style={{zIndex: 2, position: 'absolute', width: '240px', height: '135px', color: 'white', fontSize: '40px', textAlign: 'center', paddingTop: '35px', background: 'rgba(0, 0, 0, 0.5)', textShadow: 'black 0 0 12px'}}>
+            <span>{countdownSeconds}</span>
+          </div>
+        )}
+        {showFilter && <img src={freddieCam} width={'240px'} height={'135px'} style={{zIndex: 1, position: 'absolute'}} alt={'filter'} />}
+        <video ref={videoDisplay} width={'240px'} height={'135px'} autoPlay style={{transform: 'scaleX(-1)'}}></video>
+      </div>
+      <br />
+      <input type="file" name="video" accept="video/*" capture></input>
+      {showRecordedVideo && (
+        <video ref={videoDisplayAfter} width={'240px'} height={'135px'} controls></video>
+      )}
     </Fragment>
   )
 };
