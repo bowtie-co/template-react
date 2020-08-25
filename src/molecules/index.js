@@ -6,3 +6,4 @@ export { Loader, Select };
 export * from './App';
 export * from './Loader';
 export * from './Select';
+export * from './Video';

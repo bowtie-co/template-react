@@ -20,7 +20,7 @@ export const AppNavbar = ({ children, ...props }) => {
   return (
     <Navbar className='AppNavbar top-nav-section' expand="md">
       <NavbarBrand href={'/'}>
-        React App
+        Device and Video POC
       </NavbarBrand>
 
       <NavbarToggler onClick={toggleNav} />

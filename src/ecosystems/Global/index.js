@@ -5,4 +5,4 @@ export * from './WithErrorBoundary';
 export * from './WithLoader';
 export * from './WithPubnub';
 export * from './WithRoutes';
-export * from './WithSidebar';
+export * from './WithNav';

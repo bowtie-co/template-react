@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { WithChildren, WithSidebar } from '.';
+import { WithChildren, WithNav } from '.';
 import { language } from '../../lib';
 
 export const WithApp = ({ children, ...props }) => {
@@ -33,8 +33,8 @@ export const WithApp = ({ children, ...props }) => {
   };
 
   return (
-    <WithSidebar {...props} {...appProps}>
+    <WithNav {...props} {...appProps}>
       <WithChildren children={children} {...props} {...appProps} />
-    </WithSidebar>
+    </WithNav>
   );
 };
