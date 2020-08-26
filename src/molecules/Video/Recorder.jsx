@@ -12,7 +12,6 @@ export const VideoRecorder = () => {
   const [ countdownSeconds, setCountdownSeconds ] = useState(5);
   const [ permissionGranted, setPermissionGranted ] = useState(false);
   const [ showRecordedVideo, setShowRecordedVideo ] = useState(false);
-  const chunks = [];
 
   const checkMobile = () => {
     let check = false;
@@ -47,20 +46,17 @@ export const VideoRecorder = () => {
 
   const handleDataAvailable = (event) => {
     if (event.data.size > 0) {
-      chunks.push(event.data);
-      play();
+      play(event.data);
       // download();
     } else {
       // ...
     }
   };
 
-  const play = () => {
+  const play = (video) => {
     setShowRecordedVideo(true);
-    const blob = new Blob(chunks, {
-      type: 'video/webm'
-    });
-    videoDisplayAfter.current.src = URL.createObjectURL(blob);
+    debugger;
+    videoDisplayAfter.current.src = URL.createObjectURL(video);
   };
 
   // const download = () => {
@@ -101,12 +97,12 @@ export const VideoRecorder = () => {
   const record = () => {
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
       videoDisplay.current.srcObject = stream;
+      // TODO: Determine preferred codec for stream capture
       const options = {mimeType: 'video/webm;codecs=vp9'};
       const recorder = new MediaRecorder(stream, options);
 
       recorder.ondataavailable = handleDataAvailable;
       recorder.start();
-      // recorder.start(5000);
 
       // 14-15 seconds
       setTimeout(() => {
@@ -117,12 +113,8 @@ export const VideoRecorder = () => {
 
   const handleInput = (e) => {
     setShowRecordedVideo(true);
-    debugger;
-    const src = e.target.value;
-    setTimeout(() => {
-      debugger;
-      videoDisplayAfter.current.src = src;
-    }, 100);
+    const video = e.target.files[0];
+    video && play(video);
   }
 
   useEffect(() => {
@@ -135,10 +127,6 @@ export const VideoRecorder = () => {
       preview();
     }
   }, [ isMobile, isSafari ]);
-
-  useEffect(() => {
-
-  }, [ isSafari ]);
 
   useEffect(() => {
     setIsMobile(checkMobile());
@@ -165,7 +153,7 @@ export const VideoRecorder = () => {
         <video ref={videoDisplay} width={'240px'} height={'135px'} autoPlay style={{transform: 'scaleX(-1)'}}></video>
       </div>
       <br />
-      {isSafari && <input type="file" name="video" accept="video/*" capture onChange={(e) => handleInput(e)}></input>}
+      {isSafari && <input id={'input'} type={'file'} name={'video'} accept={'video/*'} capture onChange={(e) => handleInput(e)}></input>}
       {showRecordedVideo && (
         <video ref={videoDisplayAfter} width={'240px'} height={'135px'} controls></video>
       )}
