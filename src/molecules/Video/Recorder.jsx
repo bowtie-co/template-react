@@ -37,6 +37,7 @@ export const VideoRecorder = () => {
       return stream;
     } catch(err) {
       /* handle the error */
+      // TODO: handle other error types (https://blog.addpipe.com/common-getusermedia-err/)
       console.log('Rejected!', err);
       if (err.name === 'TypeError') {
         setSupportsMediaDevices(false);
@@ -136,7 +137,7 @@ export const VideoRecorder = () => {
 
   return (
     <Fragment>
-      <h3>Is mobile? {isMobile?.toString()}</h3>
+      <h4 className={'text-success'}>Is mobile? {isMobile?.toString()}</h4>
       <h4>Supports mediaDevices? {supportsMediaDevices?.toString()}</h4>
       <h4>Supports MediaRecord? {supportsMediaRecord?.toString()}</h4>
       {/* <p>User Agent: {navigator.userAgent}</p> */}
