@@ -12,6 +12,7 @@ export const VideoRecorder = () => {
   const [ supportsMediaDevices, setSupportsMediaDevices ] = useState(true);
   const [ supportsMediaRecord, setSupportsMediaRecord ] = useState();
   const [ isLandscape, setIsLandscape ] = useState(window.innerWidth > window.innerHeight);
+  const [ displayClass, setDisplayClass ] = useState('hidden');
   const [ showPreview, setShowPreview ] = useState(false);
   const [ showFilter, setShowFilter ] = useState(false);
   const [ showCountdown, setShowCountdown ] = useState(false);
@@ -118,6 +119,10 @@ export const VideoRecorder = () => {
   };
 
   useEffect(() => {
+    setDisplayClass(isLandscape ? '' : 'hidden')
+  }, [ isLandscape ]);
+
+  useEffect(() => {
     if (isMobile !== undefined) {
       preview();
     }
@@ -132,43 +137,45 @@ export const VideoRecorder = () => {
   return (
     <Fragment>
       <h3>Is mobile? {isMobile?.toString()}</h3>
-      <h3>Supports mediaDevices? {supportsMediaDevices?.toString()}</h3>
-      <h3>Supports MediaRecord? {supportsMediaRecord?.toString()}</h3>
-      <h3>User Agent: {navigator.userAgent}</h3>
-      {isMobile === false && <h3>Please view this on your mobile device</h3>}
+      <h4>Supports mediaDevices? {supportsMediaDevices?.toString()}</h4>
+      <h4>Supports MediaRecord? {supportsMediaRecord?.toString()}</h4>
+      {/* <p>User Agent: {navigator.userAgent}</p> */}
+      {isMobile === false && <h3 className={'text-danger'}>Please view this on your mobile device</h3>}
       {!isLandscape && <h3  className={'text-info'}>Please rotate your device to landscape mode</h3>}
-      {supportsMediaDevices && !permissionGranted && <ButtonBasic onClick={() => preview()}>Preview Video</ButtonBasic>}
-      {permissionGranted && (
-        <Fragment>
-          {supportsMediaRecord && <ButtonBasic onClick={() => startCountdown()} className={'btn-danger'}>Record Video</ButtonBasic>}
-          <ButtonBasic onClick={() => setShowFilter(!showFilter)} className={'btn-info'}>Toggle Filter</ButtonBasic>
-        </Fragment>
-      )}
-      {showPreview && (
-        <Fragment>
-          <br /><br />
-          <div style={{width: '240px', height: '135px'}}>
-            {showCountdown && (
-              <div style={{zIndex: 2, position: 'absolute', width: '240px', height: '135px', color: 'white', fontSize: '40px', textAlign: 'center', paddingTop: '35px', background: 'rgba(0, 0, 0, 0.5)', textShadow: 'black 0 0 12px'}}>
-                <span>{countdownSeconds}</span>
-              </div>
-            )}
-            {showFilter && <img src={freddieCam} width={'240px'} height={'135px'} style={{zIndex: 1, position: 'absolute'}} alt={'filter'} />}
-            <video ref={videoDisplay} width={'240px'} height={'135px'} autoPlay style={{transform: 'scaleX(-1)'}}></video>
-          </div>
-          <br />
-        </Fragment>
-      )}
-      {!supportsMediaRecord && (
-        <Fragment>
-          <input ref={videoInput} type={'file'} name={'video'} accept={'video/*'} capture onChange={(e) => handleInput(e)} style={{display: 'none'}}></input>
-          <ButtonBasic onClick={() => clickInput()} className={'btn-danger'}>Record Video</ButtonBasic>
-          <br /><br />
-        </Fragment>
-      )}
-      {showRecordedVideo && (
-        <video ref={videoDisplayAfter} width={'240px'} height={'135px'} controls></video>
-      )}
+      <div className={displayClass}>
+        {supportsMediaDevices && !permissionGranted && <ButtonBasic onClick={() => preview()}>Preview Video</ButtonBasic>}
+        {permissionGranted && (
+          <Fragment>
+            {supportsMediaRecord && <ButtonBasic onClick={() => startCountdown()} className={'btn-danger'}>Record Video</ButtonBasic>}
+            <ButtonBasic onClick={() => setShowFilter(!showFilter)} className={'btn-info'}>Toggle Filter</ButtonBasic>
+          </Fragment>
+        )}
+        {showPreview && (
+          <Fragment>
+            <br /><br />
+            <div style={{width: '240px', height: '135px'}}>
+              {showCountdown && (
+                <div style={{zIndex: 2, position: 'absolute', width: '240px', height: '135px', color: 'white', fontSize: '40px', textAlign: 'center', paddingTop: '35px', background: 'rgba(0, 0, 0, 0.5)', textShadow: 'black 0 0 12px'}}>
+                  <span>{countdownSeconds}</span>
+                </div>
+              )}
+              {showFilter && <img src={freddieCam} width={'240px'} height={'135px'} style={{zIndex: 1, position: 'absolute'}} alt={'filter'} />}
+              <video ref={videoDisplay} width={'240px'} height={'135px'} autoPlay style={{transform: 'scaleX(-1)'}}></video>
+            </div>
+            <br />
+          </Fragment>
+        )}
+        {!supportsMediaRecord && (
+          <Fragment>
+            <input ref={videoInput} type={'file'} name={'video'} accept={'video/*'} capture onChange={(e) => handleInput(e)} style={{display: 'none'}}></input>
+            <ButtonBasic onClick={() => clickInput()} className={'btn-danger'}>Record Video</ButtonBasic>
+            <br /><br />
+          </Fragment>
+        )}
+        {showRecordedVideo && (
+          <video ref={videoDisplayAfter} width={'240px'} height={'135px'} controls></video>
+        )}
+      </div>
     </Fragment>
   )
 };
