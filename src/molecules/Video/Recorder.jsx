@@ -8,8 +8,10 @@ export const VideoRecorder = () => {
   const videoDisplay = useRef(null);
   const videoDisplayAfter = useRef(null);
   const videoInput = useRef(null);
-  const [ isMobile, setIsMobile ] = useState(null);
-  const [ isSafari, setIsSafari ] = useState(null);
+  const [ isMobile, setIsMobile ] = useState();
+  const [ supportsMediaDevices, setSupportsMediaDevices ] = useState(true);
+  const [ supportsMediaRecord, setSupportsMediaRecord ] = useState();
+  const [ isLandscape, setIsLandscape ] = useState(window.innerWidth > window.innerHeight);
   const [ showPreview, setShowPreview ] = useState(false);
   const [ showFilter, setShowFilter ] = useState(false);
   const [ showCountdown, setShowCountdown ] = useState(false);
@@ -24,16 +26,6 @@ export const VideoRecorder = () => {
     return check;
   };
 
-  const checkSafari = () => {
-    const chromeAgent = navigator.userAgent.indexOf("Chrome") > -1;
-    const safariAgent = navigator.userAgent.indexOf("Safari") > -1;
-    return safariAgent && !chromeAgent;
-  };
-
-  const isMobileSafari = () => {
-    return !!isMobile && !!isSafari;
-  };
-
   const getPermissionAndMedia = async () => {
     let stream = null;
 
@@ -45,7 +37,11 @@ export const VideoRecorder = () => {
     } catch(err) {
       /* handle the error */
       console.log('Rejected!', err);
-      alert('You must allow audio/video for this feature to work. Please update your site settings');
+      if (err.name === 'TypeError') {
+        setSupportsMediaDevices(false);
+      } else if (err.name === 'NotAllowedError') {
+        alert('You must allow audio/video for this feature to work. Please update your site settings');
+      }
     }
   };
 
@@ -65,20 +61,6 @@ export const VideoRecorder = () => {
       videoDisplayAfter.current.src = URL.createObjectURL(video);
     }, 100);
   };
-
-  // const download = () => {
-  //   const blob = new Blob(chunks, {
-  //     type: 'video/webm'
-  //   });
-  //   const url = URL.createObjectURL(blob);
-  //   const a = document.createElement('a');
-  //   document.body.appendChild(a);
-  //   a.style = 'display: none';
-  //   a.href = url;
-  //   a.download = 'test.webm';
-  //   a.click();
-  //   URL.revokeObjectURL(url);
-  // }
 
   const preview = () => {
     getPermissionAndMedia().then((stream) => {
@@ -129,30 +111,36 @@ export const VideoRecorder = () => {
     setShowRecordedVideo(true);
     const video = e.target.files[0];
     video && play(video);
-  }
+  };
+
+  const handleResize = () => {
+    setIsLandscape(window.innerWidth > window.innerHeight);
+  };
 
   useEffect(() => {
-    if (isMobile === true) {
-      if (isSafari === false) {
-        preview();
-      }
-    } else if (isMobile === false) {
-      alert('Please view this on your mobile device');
+    if (isMobile !== undefined) {
       preview();
     }
-  }, [ isMobile, isSafari ]);
+  }, [ isMobile ]);
 
   useEffect(() => {
     setIsMobile(checkMobile());
-    setIsSafari(checkSafari());
+    setSupportsMediaRecord(typeof MediaRecorder !== 'undefined');
+    window.addEventListener('resize', handleResize);
   }, []);
 
   return (
     <Fragment>
-      {(!permissionGranted && !isMobileSafari) && <ButtonBasic onClick={() => preview()}>Preview Video</ButtonBasic>}
+      <h3>Is mobile? {isMobile?.toString()}</h3>
+      <h3>Supports mediaDevices? {supportsMediaDevices?.toString()}</h3>
+      <h3>Supports MediaRecord? {supportsMediaRecord?.toString()}</h3>
+      <h3>User Agent: {navigator.userAgent}</h3>
+      {isMobile === false && <h3>Please view this on your mobile device</h3>}
+      {!isLandscape && <h3  className={'text-info'}>Please rotate your device to landscape mode</h3>}
+      {supportsMediaDevices && !permissionGranted && <ButtonBasic onClick={() => preview()}>Preview Video</ButtonBasic>}
       {permissionGranted && (
         <Fragment>
-          <ButtonBasic onClick={() => startCountdown()} className={'btn-danger'}>Record Video</ButtonBasic>
+          {supportsMediaRecord && <ButtonBasic onClick={() => startCountdown()} className={'btn-danger'}>Record Video</ButtonBasic>}
           <ButtonBasic onClick={() => setShowFilter(!showFilter)} className={'btn-info'}>Toggle Filter</ButtonBasic>
         </Fragment>
       )}
@@ -171,7 +159,7 @@ export const VideoRecorder = () => {
           <br />
         </Fragment>
       )}
-      {isSafari && (
+      {!supportsMediaRecord && (
         <Fragment>
           <input ref={videoInput} type={'file'} name={'video'} accept={'video/*'} capture onChange={(e) => handleInput(e)} style={{display: 'none'}}></input>
           <ButtonBasic onClick={() => clickInput()} className={'btn-danger'}>Record Video</ButtonBasic>
