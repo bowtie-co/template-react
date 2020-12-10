@@ -8,27 +8,31 @@ const {
   REACT_APP_AIRBRAKE_KEY
 } = process.env;
 
-const airbrake = new Notifier({
-  projectId: REACT_APP_AIRBRAKE_ID,
-  projectKey: REACT_APP_AIRBRAKE_KEY
-});
+let airbrake;
 
-const determineEnv = () => {
-  return 'development';
-};
+if (REACT_APP_AIRBRAKE_ID && REACT_APP_AIRBRAKE_KEY) {
+  const airbrake = new Notifier({
+    projectId: REACT_APP_AIRBRAKE_ID,
+    projectKey: REACT_APP_AIRBRAKE_KEY
+  });
 
-airbrake.addFilter((notice) => {
-  if (notice) {
-    notice.context.profile = REACT_APP_PROFILE;
-    notice.context.version = REACT_APP_VERSION || '0';
-    notice.context.environment = REACT_APP_ENV || determineEnv();
+  const determineEnv = () => {
+    return 'development';
+  };
 
-    if (notice.context.environment === 'development') {
-      notice.context.severity = 'warn';
+  airbrake.addFilter((notice) => {
+    if (notice) {
+      notice.context.profile = REACT_APP_PROFILE;
+      notice.context.version = REACT_APP_VERSION || '0';
+      notice.context.environment = REACT_APP_ENV || determineEnv();
+
+      if (notice.context.environment === 'development') {
+        notice.context.severity = 'warn';
+      }
     }
-  }
 
-  return notice;
-});
+    return notice;
+  });
+}
 
 export { airbrake };

@@ -16,10 +16,12 @@ export class WithErrorBoundary extends React.Component {
 
   componentDidCatch(error, info) {
     // Send error to Airbrake
-    airbrake.notify({
-      error: error,
-      params: { info }
-    });
+    if (airbrake) {
+      airbrake.notify({
+        error: error,
+        params: { info }
+      });
+    }
 
     /**
      * TODO: Handling all unexpected errors, add notifier message(s) & redirect (if needed)

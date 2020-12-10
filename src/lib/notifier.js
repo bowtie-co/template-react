@@ -250,7 +250,7 @@ class Notifier extends EventEmitter {
   bad (resp) {
     const { data, message } = resp;
 
-    if (resp instanceof Error) {
+    if (airbrake && resp instanceof Error) {
       airbrake.notify({ error: resp });
     }
 
@@ -267,10 +267,12 @@ class Notifier extends EventEmitter {
     console.warn(error);
 
     // Send error to Airbrake
-    return airbrake.notify({
-      error,
-      params
-    });
+    if (airbrake) {
+      return airbrake.notify({
+        error,
+        params
+      });
+    }
   }
 }
 
