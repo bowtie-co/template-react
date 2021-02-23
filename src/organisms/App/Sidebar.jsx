@@ -16,7 +16,7 @@ export const AppSidebar = ({ children, className, isCollapsed, toggleIsCollapsed
           <Nav vertical>
             <NavLink href='/'>
               <AppIcon iconName={'list'} />
-              <span>{translate('sidebar.users')}</span>
+              <span>{translate('general.home')}</span>
             </NavLink>
           </Nav>
         </div>
